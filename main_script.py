@@ -18,6 +18,7 @@ while success:
     count += 1
     geneva_object_0.detect_tags(fname)
 
+
 # fname = f'graphics/test/0.0_1.5.jpg'
 # c_point = 0  # defines which corner to evaluate
 # geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)

@@ -42,12 +42,17 @@ class Geneva:
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
         corners = np.array(corners)
-        points = corners[0][0]  # use only first marker (should only be one)
+        if corners.any():
+            points = corners[0][0]  # use only first marker (should only be one)
+            self.x.append(points[self.c_point, 0])
+            self.y.append(points[self.c_point, 1])
+            self.corners = corners  # keeps only the latest corner for plotting purposes
+            self.ids = ids  # keeps only the latest corner for plotting purposes
+        else:
+            print("failed to detect marker")
 
-        self.x.append(points[self.c_point, 0])
-        self.y.append(points[self.c_point, 1])
-        self.corners = corners  # keeps only the latest corner for plotting purposes
-        self.ids = ids  # keeps only the latest corner for plotting purposes
+
+
 
     def draw_tags(self):
         scale = 1
