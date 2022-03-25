@@ -3,16 +3,23 @@ import numpy as np
 import csv
 
 
-class Tag:
+class Geneva:
     """
     Image object containing tag information
     """
-    def __init__(self, fname, tag_type):
-        self.fname = fname
-        self.image = cv2.imread(fname)
+    def __init__(self, c_point, tag_type):
+        self.c_point = c_point  # corner point, defines which marker corner to evaluate
+        self.image = []
         self.tag_type = tag_type
         self.dict = self.get_dict()
-        self.markers, self.corners, self.ids = self.detect_tags()  # necessary for rotation
+        self.ids = []
+        self.corners = []
+
+        self.x = []  # x values of marker corners
+        self.y = []  # y values of marker corners
+        self.x_c = []  # x and y of center
+        self.y_c = []
+        self.theta = []
 
     def get_dict(self):
         super().__init__()
@@ -29,31 +36,33 @@ class Tag:
             print("incorrect tag type")
         return used_dict
 
-    def detect_tags(self):
+    def detect_tags(self, fname):
+        self.image = cv2.imread(fname)
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
         corners = np.array(corners)
-        markers = []
-        if ids is None:
-            return markers, [], []
-        for tag_id in range(len(ids)):
-            for i in range(len(ids)):
-                current_id = ids[i]
-                if current_id == tag_id:
-                    x = [corners[i, 0, 0, 0], corners[i, 0, 1, 0],
-                         corners[i, 0, 2, 0], corners[i, 0, 3, 0]]
+        points = corners[0][0]  # use only first marker (should only be one)
 
-                    y = [corners[i, 0, 0, 1], corners[i, 0, 1, 1],
-                         corners[i, 0, 2, 1], corners[i, 0, 3, 1]]
-                    markers.append([x, y, tag_id])
-        return markers, corners, ids
+        self.x.append(points[self.c_point, 0])
+        self.y.append(points[self.c_point, 1])
+        self.corners = corners  # keeps only the latest corner for plotting purposes
+        self.ids = ids  # keeps only the latest corner for plotting purposes
 
     def draw_tags(self):
         scale = 1
         image = cv2.resize(self.image, (0, 0), fx=scale, fy=scale)
         frame = cv2.aruco.drawDetectedMarkers(image, self.corners*scale, self.ids)
-        cv2.imwrite('graphics/rot.jpg', image)
         cv2.imshow('Tags', frame)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    def find_center(self):
+        """find center of rotation for disc"""
+        self.x_c = np.mean(self.x)
+        self.y_c = np.mean(self.y)
+
+    def find_angles(self):
+        x = np.subtract(self.x, self.x_c)
+        y = np.subtract(self.y, self.y_c)
+        self.theta = np.arctan2(y, x)
