@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 import tag_detection_2
 
-tag_type = 'apriltag_36h11'
-vidcap = cv2.VideoCapture('graphics/test_vid.mp4')
+tag_type = 'aruco_4x4'
+vidcap = cv2.VideoCapture('graphics/test_vid_2.mp4')
 success, image = vidcap.read()
 count = 0
 c_point = 0  # defines which corner to evaluate
@@ -19,11 +19,13 @@ while success:
     geneva_object_0.detect_tags(fname)
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
-geneva_object_0.draw_corner_points()
+geneva_object_0.corner_point_video()
 geneva_object_0.plot_angles()
 print(len(geneva_object_0.t))
-print(len(geneva_object_0.x))
-geneva_object_0.plot_angles()
+print(len(geneva_object_0.theta))
+print(len(geneva_object_0.image))
+geneva_object_0.calc_theta_derivatives()
+geneva_object_0.plot_derivatives()
 
 # fname = f'graphics/test/0.0_1.5.jpg'
 # c_point = 0  # defines which corner to evaluate
