@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 import tag_detection_2
+import matplotlib.pyplot as plt
 
 tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/test_vid_2.mp4')
@@ -21,12 +22,15 @@ geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
 geneva_object_0.plot_angles()
-print(len(geneva_object_0.t))
-print(len(geneva_object_0.theta))
-print(len(geneva_object_0.image))
 geneva_object_0.calc_theta_derivatives()
 geneva_object_0.plot_derivatives()
+geneva_object_0.smoothen_signal()
 
+plt.plot(geneva_object_0.t_new, geneva_object_0.theta_new)
+plt.plot(geneva_object_0.t, geneva_object_0.theta)
+plt.show()
+
+geneva_object_0.plot_smooth()
 # fname = f'graphics/test/0.0_1.5.jpg'
 # c_point = 0  # defines which corner to evaluate
 # geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)

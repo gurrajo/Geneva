@@ -24,6 +24,8 @@ class Geneva:
         self.theta_bis = []
         self.t = []
         self.t_increment = 1/30  # frame rate
+        self.theta_new = []
+        self.t_new = []
 
     def get_dict(self):
         super().__init__()
@@ -101,6 +103,17 @@ class Geneva:
             out.write(self.image[i])
         out.release()
 
+    def smoothen_signal(self):
+        """average 3 data points into 1"""
+        points = 3
+        i = 0
+        self.theta_new = []
+        self.t_new = []
+        while i < len(self.theta)/3:
+            self.theta_new.append(np.mean(self.theta[i*points:(i+1)*points-1]))
+            self.t_new.append(self.t[points*i])
+            i += 1
+
     def calc_theta_derivatives(self):
         self.theta_dot = np.gradient(self.theta, self.t)
         self.theta_bis = np.gradient(self.theta_dot, self.t)
@@ -115,4 +128,13 @@ class Geneva:
         print(len(self.theta))
         print(len(self.t))
         plt.plot(self.t, self.theta)
+        plt.show()
+
+    def plot_smooth(self):
+        t_new = self.t_new
+        theta_dot_new = np.gradient(self.theta_new, self.t_new)
+        theta_bis_new = np.gradient(theta_dot_new, self.t_new)
+        plt.plot(t_new, theta_dot_new)
+        plt.show()
+        plt.plot(t_new, theta_bis_new)
         plt.show()
