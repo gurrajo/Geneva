@@ -17,7 +17,13 @@ while success:
     print('Read a new frame: ', success)
     count += 1
     geneva_object_0.detect_tags(fname)
-
+geneva_object_0.find_center()
+geneva_object_0.find_angles()
+geneva_object_0.draw_corner_points()
+geneva_object_0.plot_angles()
+print(len(geneva_object_0.t))
+print(len(geneva_object_0.x))
+geneva_object_0.plot_angles()
 
 # fname = f'graphics/test/0.0_1.5.jpg'
 # c_point = 0  # defines which corner to evaluate
