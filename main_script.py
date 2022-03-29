@@ -13,11 +13,12 @@ geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)
 
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
-    cv2.imwrite(fname, image)  # save frame as JPEG file
+    # cv2.imwrite(fname, image)  # save frame as JPEG file
     success, image = vidcap.read()
     print('Read a new frame: ', success)
     count += 1
-    geneva_object_0.detect_tags(fname)
+    if success:
+        geneva_object_0.detect_tags(image)
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
@@ -25,11 +26,6 @@ geneva_object_0.plot_angles()
 geneva_object_0.calc_theta_derivatives()
 geneva_object_0.plot_derivatives()
 geneva_object_0.smoothen_signal()
-
-plt.plot(geneva_object_0.t_new, geneva_object_0.theta_new)
-plt.plot(geneva_object_0.t, geneva_object_0.theta)
-plt.show()
-
 geneva_object_0.plot_smooth()
 # fname = f'graphics/test/0.0_1.5.jpg'
 # c_point = 0  # defines which corner to evaluate

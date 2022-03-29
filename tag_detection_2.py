@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import signal
 
 
 class Geneva:
@@ -24,8 +25,9 @@ class Geneva:
         self.theta_bis = []
         self.t = []
         self.t_increment = 1/30  # frame rate
-        self.theta_new = []
-        self.t_new = []
+        self.theta_smooth = []
+        self.theta_dot_smooth = []
+        self.theta_bis_smooth = []
 
     def get_dict(self):
         super().__init__()
@@ -42,9 +44,7 @@ class Geneva:
             print("incorrect tag type")
         return used_dict
 
-    def detect_tags(self, fname):
-
-        image = cv2.imread(fname)
+    def detect_tags(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
@@ -105,14 +105,10 @@ class Geneva:
 
     def smoothen_signal(self):
         """average 3 data points into 1"""
-        points = 3
-        i = 0
-        self.theta_new = []
-        self.t_new = []
-        while i < len(self.theta)/3:
-            self.theta_new.append(np.mean(self.theta[i*points:(i+1)*points-1]))
-            self.t_new.append(self.t[points*i])
-            i += 1
+        b, a = signal.butter(4, 0.2)  # coefficients worth looking at
+        self.theta_smooth = signal.filtfilt(b, a, self.theta)
+        self.theta_dot_smooth = np.gradient(self.theta_smooth, self.t)
+        self.theta_bis_smooth = np.gradient(self.theta_dot_smooth, self.t)
 
     def calc_theta_derivatives(self):
         self.theta_dot = np.gradient(self.theta, self.t)
@@ -131,10 +127,42 @@ class Geneva:
         plt.show()
 
     def plot_smooth(self):
-        t_new = self.t_new
-        theta_dot_new = np.gradient(self.theta_new, self.t_new)
-        theta_bis_new = np.gradient(theta_dot_new, self.t_new)
-        plt.plot(t_new, theta_dot_new)
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, self.theta)
+        plt.xlabel('t')
+        plt.ylabel('angle')
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, self.theta_smooth)
+        plt.xlabel('t')
+        plt.ylabel('angle (smoothened)')
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, self.theta_dot)
+        plt.xlabel('t')
+        plt.ylabel('angular velocity')
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, self.theta_dot_smooth)
+        plt.xlabel('t')
+        plt.ylabel('angular velocity (smoothened)')
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(range(len(self.t)), self.t)
+        plt.xlabel('ind')
+        plt.ylabel('t')
+
         plt.show()
-        plt.plot(t_new, theta_bis_new)
-        plt.show()
+
+        # t_new = self.t_new
+        # theta_dot_new = np.gradient(self.theta_new, self.t_new)
+        # theta_bis_new = np.gradient(theta_dot_new, self.t_new)
+        # plt.plot(t_new, theta_dot_new)
+        # plt.show()
+        # plt.plot(t_new, theta_bis_new)
+        # plt.show()
