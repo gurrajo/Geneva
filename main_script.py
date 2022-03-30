@@ -19,6 +19,8 @@ while success:
     count += 1
     if success:
         geneva_object_0.detect_tags(image)
+    #if count == 1: # shows marker detection
+    #    geneva_object_0.draw_tags()
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()

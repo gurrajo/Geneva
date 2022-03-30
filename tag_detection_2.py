@@ -68,9 +68,10 @@ class Geneva:
 
     def draw_tags(self):
         scale = 1
-        image = cv2.resize(self.image, (0, 0), fx=scale, fy=scale)
+        image = cv2.resize(self.image[-1], (0, 0), fx=scale, fy=scale)
         frame = cv2.aruco.drawDetectedMarkers(image, self.corners*scale, self.ids)
         cv2.imshow('Tags', frame)
+        cv2.imwrite('graphics/tag_det.jpg', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -132,24 +133,28 @@ class Geneva:
         plt.plot(self.t, self.theta)
         plt.xlabel('t')
         plt.ylabel('angle')
+        plt.savefig('graphics/theta.jpg')
 
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(self.t, self.theta_smooth)
         plt.xlabel('t')
         plt.ylabel('angle (smoothened)')
+        plt.savefig('graphics/theta_smooth.jpg')
 
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(self.t, self.theta_dot)
         plt.xlabel('t')
         plt.ylabel('angular velocity')
+        plt.savefig('graphics/theta_dot.jpg')
 
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(self.t, self.theta_dot_smooth)
         plt.xlabel('t')
         plt.ylabel('angular velocity (smoothened)')
+        plt.savefig('graphics/theta_dot_smooth.jpg')
 
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
