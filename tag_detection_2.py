@@ -77,24 +77,54 @@ class Geneva:
         cv2.destroyAllWindows()
 
     def find_center(self):
-        """find center of rotation for disc
-        assumes a full rotation has been done"""
+        """"""
+        def get_intersect(a1, a2, b1, b2):
+            """
+            Returns the point of intersection of the lines passing through a2,a1 and b2,b1.
+            a1: [x, y] a point on the first line
+            a2: [x, y] another point on the first line
+            b1: [x, y] a point on the second line
+            b2: [x, y] another point on the second line
+            """
+            s = np.vstack([a1, a2, b1, b2])  # s for stacked
+            h = np.hstack((s, np.ones((4, 1))))  # h for homogeneous
+            l1 = np.cross(h[0], h[1])  # get first line
+            l2 = np.cross(h[2], h[3])  # get second line
+            x, y, z = np.cross(l1, l2)  # point of intersection
+            if z == 0:  # lines are parallel
+                return float('inf'), float('inf')
+            return int(x / z), int(y / z)
 
         x_1 = self.x[0]
         y_1 = self.y[0]
-        x_2 = self.x[-1]
-        y_2 = self.y[-1]
-        x = sympy.Symbol('x')
-        f_1 = (x-x_2)*(y_2 - y_1)/(x_1 - x_2) + y_1
+        x_2 = self.x[60]  # points not to close to one another
+        y_2 = self.y[60]
 
-        x_2 = self.x[int(len(self.x)/2)]
-        y_2 = self.y[int(len(self.x)/2)]
-        f_2 = (x - x_2) * (y_2 - y_1) / (x_1 - x_2) + y_1
+        def f_1(x):
+            return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
 
-        exp = f_1 - f_2
-        sol = sympy.solve(exp)
-        self.y_c = int((sol[0] - y_1 + (y_2 - y_1)/(x_1-x_2)*x_2)*(x_1 - x_2)/(y_2 - y_1))
-        self.x_c = int(sol[0])
+        a_1 = [0, f_1(0)]
+        a_2 = [100, f_1(100)]
+
+        image = cv2.line(self.image[0], (0, int(f_1(0))), (4000, int(f_1(4000))), (0, 0, 0))
+        image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
+        image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
+
+        x_2 = self.x[40]
+        y_2 = self.y[40]
+
+        image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
+
+        def f_2(x):
+            return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
+
+        b_1 = [0, f_2(0)]
+        b_2 = [100, f_2(100)]
+        (self.x_c, self.y_c) = get_intersect(a_1, a_2, b_1, b_2)
+        image = cv2.line(image, (0, int(f_2(0))), (4000, int(f_2(4000))), (0, 0, 0))
+        cv2.imshow('Intersection', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         print(self.x_c)
         print(self.y_c)
