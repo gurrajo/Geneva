@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+import sympy
 
 
 class Geneva:
@@ -79,16 +80,33 @@ class Geneva:
         """find center of rotation for disc
         assumes a full rotation has been done"""
 
-        self.x_c = np.mean((np.max(self.x), np.min(self.x)))
-        self.y_c = np.mean((np.max(self.y), np.min(self.y)))
+        x_1 = self.x[0]
+        y_1 = self.y[0]
+        x_2 = self.x[-1]
+        y_2 = self.y[-1]
+        x = sympy.Symbol('x')
+        f_1 = (x-x_2)*(y_2 - y_1)/(x_1 - x_2) + y_1
+
+        x_2 = self.x[int(len(self.x)/2)]
+        y_2 = self.y[int(len(self.x)/2)]
+        f_2 = (x - x_2) * (y_2 - y_1) / (x_1 - x_2) + y_1
+
+        exp = f_1 - f_2
+        sol = sympy.solve(exp)
+        self.y_c = int((sol[0] - y_1 + (y_2 - y_1)/(x_1-x_2)*x_2)*(x_1 - x_2)/(y_2 - y_1))
+        self.x_c = int(sol[0])
+
+        print(self.x_c)
+        print(self.y_c)
 
     def find_angles(self):
         x = np.subtract(self.x, self.x_c)
         y = np.subtract(self.y, self.y_c)
+
         self.theta = np.arctan2(y, x)
         for i, ang in enumerate(self.theta):
-            if ang < 0:
-                #self.theta[i:-1] += np.pi*2
+            if ang > 0:
+                self.theta[i:-1] -= np.pi*2
                 break
         self.theta = np.delete(self.theta, -1)
         del self.t[-1]
@@ -96,7 +114,7 @@ class Geneva:
     def corner_point_video(self):
         for i, p in enumerate(self.x):
             cv2.circle(self.image[i], (p, self.y[i]), 10, (255, 0, 0))
-            cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 0, 0))
+            cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255))
         height, width, layers = self.image[0].shape
         size = (width, height)
         out = cv2.VideoWriter('project.avi', cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
