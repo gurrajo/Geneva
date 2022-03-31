@@ -88,7 +88,7 @@ class Geneva:
         self.theta = np.arctan2(y, x)
         for i, ang in enumerate(self.theta):
             if ang < 0:
-                self.theta[i:-1] += np.pi*2
+                #self.theta[i:-1] += np.pi*2
                 break
         self.theta = np.delete(self.theta, -1)
         del self.t[-1]

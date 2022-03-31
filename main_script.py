@@ -5,10 +5,10 @@ import tag_detection_2
 import matplotlib.pyplot as plt
 
 tag_type = 'aruco_4x4'
-vidcap = cv2.VideoCapture('graphics/test_vid_2.mp4')
+vidcap = cv2.VideoCapture('graphics/model_1_4k_nolight.mp4')
 success, image = vidcap.read()
 count = 0
-c_point = 0  # defines which corner to evaluate
+c_point = 2  # defines which corner to evaluate
 geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)
 
 while success:
@@ -19,8 +19,8 @@ while success:
     count += 1
     if success:
         geneva_object_0.detect_tags(image)
-    #if count == 1: # shows marker detection
-    #    geneva_object_0.draw_tags()
+    if count == 305: # shows marker detection
+        geneva_object_0.draw_tags()
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
