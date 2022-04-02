@@ -8,7 +8,7 @@ tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
 success, image = vidcap.read()
 count = 0
-c_point = 2  # defines which corner to evaluate
+c_point = 0  # defines which corner to evaluate
 geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)
 
 while success:
@@ -29,15 +29,4 @@ geneva_object_0.calc_theta_derivatives()
 geneva_object_0.plot_derivatives()
 geneva_object_0.smoothen_signal()
 geneva_object_0.plot_smooth()
-# fname = f'graphics/test/0.0_1.5.jpg'
-# c_point = 0  # defines which corner to evaluate
-# geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)
-# geneva_object_0.detect_tags(fname)
-#
-# print(geneva_object_0.x)
-#
-# c_point = 1  # defines which corner to evaluate
-# geneva_object_1 = tag_detection_2.Geneva(c_point, tag_type)
-# geneva_object_1.detect_tags(fname)
-#
-# print(geneva_object_1.x)
+geneva_object_0.plot_combined()

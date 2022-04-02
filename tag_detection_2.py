@@ -16,6 +16,8 @@ class Geneva:
         self.dict = self.get_dict()
         self.ids = []
         self.corners = []
+        self.rot_dir = 'CCW'  # or CCW
+        self.frame_remove = 7
 
         self.x = []  # x values of marker corners
         self.y = []  # y values of marker corners
@@ -53,8 +55,8 @@ class Geneva:
 
         if corners.any():
             points = corners[0][0]  # use only first marker (should only be one)
-            self.x.append(points[self.c_point, 0])
-            self.y.append(points[self.c_point, 1])
+            self.x.append(points[:, 0])
+            self.y.append(points[:, 1])
             self.corners = corners  # keeps only the latest corner for plotting purposes
             self.ids = ids  # keeps only the latest corner for plotting purposes
             if self.t:
@@ -95,10 +97,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[0]
-        y_1 = self.y[0]
-        x_2 = self.x[60]  # points not to close to one another
-        y_2 = self.y[60]
+        x_1 = self.x[0][self.c_point]
+        y_1 = self.y[0][self.c_point]
+        x_2 = self.x[60][self.c_point]  # points not to close to one another
+        y_2 = self.y[60][self.c_point]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -110,8 +112,8 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_2 = self.x[40]
-        y_2 = self.y[40]
+        x_2 = self.x[40][self.c_point]
+        y_2 = self.y[40][self.c_point]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -122,9 +124,9 @@ class Geneva:
         b_2 = [100, f_2(100)]
         (self.x_c, self.y_c) = get_intersect(a_1, a_2, b_1, b_2)
         image = cv2.line(image, (0, int(f_2(0))), (4000, int(f_2(4000))), (0, 0, 0))
-        cv2.imshow('Intersection', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.imshow('Intersection', image)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
         print(self.x_c)
         print(self.y_c)
@@ -134,16 +136,25 @@ class Geneva:
         y = np.subtract(self.y, self.y_c)
 
         self.theta = np.arctan2(y, x)
-        for i, ang in enumerate(self.theta):
-            if ang > 0:
-                self.theta[i:-1] -= np.pi*2
-                break
-        self.theta = np.delete(self.theta, -1)
-        del self.t[-1]
+
+        for i in range(4):
+            for j in range(len(self.theta)):
+                ang = self.theta[j, i]
+                if self.rot_dir == 'CW' and ang < 0 and self.theta[j-1,i] > 0:
+                    self.theta[j:-1, i] += np.pi*2
+                    break
+                elif self.rot_dir == 'CCW' and ang > 0 and self.theta[j-1,i] < 0:
+                    self.theta[j:-1, i] -= np.pi * 2
+                    break
+
+        for i in range(self.frame_remove):  # remove unwanted last values
+            self.theta = np.delete(self.theta, [-1], 0)
+            del self.t[-1]
 
     def corner_point_video(self):
         for i, p in enumerate(self.x):
-            cv2.circle(self.image[i], (p, self.y[i]), 10, (255, 0, 0))
+            for j in range(4):
+                cv2.circle(self.image[i], (p[j], self.y[i][j]), 10, (255, 0, 0))
             cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255))
         height, width, layers = self.image[0].shape
         size = (width, height)
@@ -153,15 +164,21 @@ class Geneva:
         out.release()
 
     def smoothen_signal(self):
-        """average 3 data points into 1"""
         b, a = signal.butter(4, 0.2)  # coefficients worth looking at
-        self.theta_smooth = signal.filtfilt(b, a, self.theta)
-        self.theta_dot_smooth = np.gradient(self.theta_smooth, self.t)
-        self.theta_bis_smooth = np.gradient(self.theta_dot_smooth, self.t)
+        self.theta_smooth = np.zeros((len(self.theta), 4))
+        self.theta_dot_smooth = np.zeros((len(self.theta), 4))
+        self.theta_bis_smooth = np.zeros((len(self.theta), 4))
+        for i in range(4):
+            self.theta_smooth[:, i] = signal.filtfilt(b, a, self.theta[:, i])
+            self.theta_dot_smooth[:, i] = np.gradient(self.theta_smooth[:, i], self.t)
+            self.theta_bis_smooth[:, i] = np.gradient(self.theta_dot_smooth[:, i], self.t)
 
     def calc_theta_derivatives(self):
-        self.theta_dot = np.gradient(self.theta, self.t)
-        self.theta_bis = np.gradient(self.theta_dot, self.t)
+        self.theta_dot = np.zeros((len(self.theta), 4))
+        self.theta_bis = np.zeros((len(self.theta), 4))
+        for i in range(4):
+            self.theta_dot[:, i] = np.gradient(self.theta[:, i], self.t)
+            self.theta_bis[:, i] = np.gradient(self.theta_dot[:, i], self.t)
 
     def plot_derivatives(self):
         plt.plot(self.t, self.theta_dot)
@@ -173,6 +190,23 @@ class Geneva:
         print(len(self.theta))
         print(len(self.t))
         plt.plot(self.t, self.theta)
+        plt.show()
+
+    def plot_combined(self):
+        comb = np.average(self.theta_dot, 1)
+        comb_2 = np.average(self.theta_bis, 1)
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, comb)
+        plt.xlabel('t')
+        plt.ylabel('angle')
+
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
+        plt.plot(self.t, comb_2)
+        plt.xlabel('t')
+        plt.ylabel('angle')
         plt.show()
 
     def plot_smooth(self):
