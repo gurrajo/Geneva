@@ -9,7 +9,7 @@ vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
 success, image = vidcap.read()
 count = 0
 c_point = 0  # defines which corner to evaluate
-geneva_object_0 = tag_detection_2.Geneva(c_point, tag_type)
+geneva_object_0 = tag_detection_2.Geneva(tag_type)
 
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
@@ -19,7 +19,7 @@ while success:
     count += 1
     if success:
         geneva_object_0.detect_tags(image)
-    if count == 700:  # shows marker detection
+    if count == 1000 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
 geneva_object_0.find_center()
 geneva_object_0.find_angles()

@@ -9,15 +9,14 @@ class Geneva:
     """
     Object representing a geneva drive
     """
-    def __init__(self, c_point, tag_type):
-        self.c_point = c_point  # corner point, defines which marker corner to evaluate
+    def __init__(self, tag_type):
         self.image = []
         self.tag_type = tag_type
         self.dict = self.get_dict()
         self.ids = []
         self.corners = []
-        self.rot_dir = 'CCW'  # or CCW
-        self.frame_remove = 7
+        self.rot_dir = 'CCW'  # or CW
+        self.frame_remove = 7  # number of end frames to remove
 
         self.x = []  # x values of marker corners
         self.y = []  # y values of marker corners
