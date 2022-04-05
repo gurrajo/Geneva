@@ -31,6 +31,7 @@ class Geneva:
         self.theta_smooth = []
         self.theta_dot_smooth = []
         self.theta_bis_smooth = []
+        self.theta_norm = []
 
     def get_dict(self):
         super().__init__()
@@ -69,6 +70,10 @@ class Geneva:
             self.t_increment += 1/30
             print("failed to detect marker")
 
+    def normalize_signals(self):
+        ref_point = 10  # reference frame
+        self.theta_norm = np.subtract(self.theta, self.theta[ref_point, :])
+
     def draw_tags(self):
         scale = 1
         image = cv2.resize(self.image[-1], (0, 0), fx=scale, fy=scale)
@@ -97,10 +102,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[0][self.c_point]
-        y_1 = self.y[0][self.c_point]
-        x_2 = self.x[60][self.c_point]  # points not to close to one another
-        y_2 = self.y[60][self.c_point]
+        x_1 = self.x[10][0]
+        y_1 = self.y[10][0]
+        x_2 = self.x[60][0]  # points not to close to one another
+        y_2 = self.y[60][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -112,8 +117,10 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_2 = self.x[40][self.c_point]
-        y_2 = self.y[40][self.c_point]
+        x_1 = self.x[10][1]
+        y_1 = self.y[10][1]
+        x_2 = self.x[60][1]
+        y_2 = self.y[60][1]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -186,10 +193,8 @@ class Geneva:
         plt.plot(self.t, self.theta_bis)
         plt.show()
 
-    def plot_angles(self):
-        print(len(self.theta))
-        print(len(self.t))
-        plt.plot(self.t, self.theta)
+    def plot_angles(self, sig):
+        plt.plot(self.t, sig)
         plt.show()
 
     def plot_combined(self):
