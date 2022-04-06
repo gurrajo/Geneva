@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
+t = vidcap.get(cv2.CAP_PROP_POS_MSEC) * 1e-3  # timestamp
 success, image = vidcap.read()
 count = 0
 c_point = 0  # defines which corner to evaluate
@@ -17,14 +18,15 @@ geneva_object_0 = tag_detection_2.Geneva(tag_type)
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
+    if success:
+        geneva_object_0.detect_tags(image, t)
+        t = vidcap.get(cv2.CAP_PROP_POS_MSEC) * 1e-3  # timestamp
+    if count == 1000 or count == 7800:  # shows marker detection
+        geneva_object_0.draw_tags()
     success, image = vidcap.read()
     print('Read a new frame: ', success)
     count += 1
-    if success:
-        t = vidcap.get(cv2.CAP_PROP_POS_MSEC)*1e-3  # timestamp
-        geneva_object_0.detect_tags(image, t)
-    if count == 1000 or count == 7800:  # shows marker detection
-        geneva_object_0.draw_tags()
+
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
