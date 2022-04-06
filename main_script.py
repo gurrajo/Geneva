@@ -2,6 +2,8 @@
 import numpy as np
 import cv2
 import tag_detection_2
+import requests
+import time
 import matplotlib.pyplot as plt
 
 tag_type = 'aruco_4x4'
