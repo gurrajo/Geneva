@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import signal
 import sympy
+from scipy import signal
 
 
 class Geneva:
@@ -27,9 +27,6 @@ class Geneva:
         self.theta_bis = []
         self.t = []
         self.t_increment = 1/30  # frame rate
-        self.theta_smooth = []
-        self.theta_dot_smooth = []
-        self.theta_bis_smooth = []
         self.theta_norm = []
 
     def get_dict(self):
@@ -169,91 +166,39 @@ class Geneva:
             out.write(self.image[i])
         out.release()
 
-    def smoothen_signal(self):
-        b, a = signal.butter(4, 0.2)  # coefficients worth looking at
-        self.theta_smooth = np.zeros((len(self.theta), 4))
-        self.theta_dot_smooth = np.zeros((len(self.theta), 4))
-        self.theta_bis_smooth = np.zeros((len(self.theta), 4))
-        for i in range(4):
-            self.theta_smooth[:, i] = signal.filtfilt(b, a, self.theta[:, i])
-            self.theta_dot_smooth[:, i] = np.gradient(self.theta_smooth[:, i], self.t)
-            self.theta_bis_smooth[:, i] = np.gradient(self.theta_dot_smooth[:, i], self.t)
+    def calc_derivatives(self, sig=None):
+        if sig is None:
+            sig = self.theta_norm
+        shape = np.shape(sig)
+        derivative = np.zeros(shape)
+        if len(shape) == 1:
+            derivative = np.gradient(sig, self.t)
+        else:
+            for i in range(shape[1]):
+                derivative[:, i] = np.gradient(sig[:, i], self.t)
 
-    def calc_theta_derivatives(self):
-        self.theta_dot = np.zeros((len(self.theta), 4))
-        self.theta_bis = np.zeros((len(self.theta), 4))
-        for i in range(4):
-            self.theta_dot[:, i] = np.gradient(self.theta[:, i], self.t)
-            self.theta_bis[:, i] = np.gradient(self.theta_dot[:, i], self.t)
+        return derivative
 
-    def plot_derivatives(self):
-        plt.plot(self.t, self.theta_dot)
-        plt.show()
-        plt.plot(self.t, self.theta_bis)
-        plt.show()
+    def smoothen_signal(self, sig=None):
+        if sig is None:
+            sig = self.theta_norm
+        b, a = signal.butter(2, 0.3)  # coefficients worth looking at
+        shape = np.shape(sig)
+        smooth = np.zeros(shape)
+        for i in range(shape[1]):
+            smooth[:, i] = signal.filtfilt(b, a, sig[:, i])
+        return smooth
 
-    def plot_angles(self, sig):
+    def combine_signal(self, sig=None):
+        if sig is None:
+            sig = self.theta_norm
+        combined = np.average(sig, 1)
+        return combined
+
+    def plot_signal(self, sig=None):
+        if sig is None:
+            sig = self.theta_norm
+        fig1, ax1 = plt.subplots()
+        plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(self.t, sig)
-        plt.show()
-
-    def plot_combined(self):
-        comb = np.average(self.theta_dot, 1)
-        comb_2 = np.average(self.theta_bis, 1)
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, comb)
         plt.xlabel('t')
-        plt.ylabel('angle')
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, comb_2)
-        plt.xlabel('t')
-        plt.ylabel('angle')
-        plt.show()
-
-    def plot_smooth(self):
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, self.theta)
-        plt.xlabel('t')
-        plt.ylabel('angle')
-        plt.savefig('graphics/theta.jpg')
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, self.theta_smooth)
-        plt.xlabel('t')
-        plt.ylabel('angle (smoothened)')
-        plt.savefig('graphics/theta_smooth.jpg')
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, self.theta_dot)
-        plt.xlabel('t')
-        plt.ylabel('angular velocity')
-        plt.savefig('graphics/theta_dot.jpg')
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, self.theta_dot_smooth)
-        plt.xlabel('t')
-        plt.ylabel('angular velocity (smoothened)')
-        plt.savefig('graphics/theta_dot_smooth.jpg')
-
-        fig1, ax1 = plt.subplots()
-        plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(range(len(self.t)), self.t)
-        plt.xlabel('ind')
-        plt.ylabel('t')
-
-        plt.show()
-
-        # t_new = self.t_new
-        # theta_dot_new = np.gradient(self.theta_new, self.t_new)
-        # theta_bis_new = np.gradient(theta_dot_new, self.t_new)
-        # plt.plot(t_new, theta_dot_new)
-        # plt.show()
-        # plt.plot(t_new, theta_bis_new)
-        # plt.show()

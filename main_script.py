@@ -6,6 +6,7 @@ import requests
 import time
 import matplotlib.pyplot as plt
 
+
 tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
 success, image = vidcap.read()
@@ -26,10 +27,26 @@ while success:
 geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
-geneva_object_0.calc_theta_derivatives()
-geneva_object_0.plot_derivatives()
-geneva_object_0.smoothen_signal()
-geneva_object_0.plot_smooth()
-geneva_object_0.plot_combined()
 geneva_object_0.normalize_signals()
-geneva_object_0.plot_angles(geneva_object_0.theta_norm)
+geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
+geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)
+geneva_object_0.plot_signal()
+geneva_object_0.plot_signal(geneva_object_0.theta_dot)
+geneva_object_0.plot_signal(geneva_object_0.theta_bis)
+
+geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
+
+geneva_object_0.theta_dot_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_smooth)
+geneva_object_0.theta_bis_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_smooth)
+geneva_object_0.plot_signal(geneva_object_0.theta_smooth)
+geneva_object_0.plot_signal(geneva_object_0.theta_dot_smooth)
+geneva_object_0.plot_signal(geneva_object_0.theta_bis_smooth)
+
+combined = geneva_object_0.combine_signal()
+geneva_object_0.theta_dot_comb = geneva_object_0.calc_derivatives(combined)
+geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_comb)
+geneva_object_0.plot_signal(combined)
+geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb)
+geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb)
+
+plt.show()
