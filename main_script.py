@@ -21,7 +21,8 @@ while success:
     print('Read a new frame: ', success)
     count += 1
     if success:
-        geneva_object_0.detect_tags(image)
+        t = vidcap.get(cv2.CAP_PROP_POS_MSEC)*1e-3  # timestamp
+        geneva_object_0.detect_tags(image, t)
     if count == 1000 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
 geneva_object_0.find_center()

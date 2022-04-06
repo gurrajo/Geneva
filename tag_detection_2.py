@@ -26,7 +26,6 @@ class Geneva:
         self.theta_dot = []
         self.theta_bis = []
         self.t = []
-        self.t_increment = 1/30  # frame rate
         self.theta_norm = []
 
     def get_dict(self):
@@ -44,7 +43,7 @@ class Geneva:
             print("incorrect tag type")
         return used_dict
 
-    def detect_tags(self, image):
+    def detect_tags(self, image, t):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
@@ -56,14 +55,9 @@ class Geneva:
             self.y.append(points[:, 1])
             self.corners = corners  # keeps only the latest corner for plotting purposes
             self.ids = ids  # keeps only the latest corner for plotting purposes
-            if self.t:
-                self.t.append(self.t[-1] + self.t_increment)
-                self.t_increment = 1/30
-            else:
-                self.t = [0.0]
+            self.t.append(t)
             self.image.append(image)
         else:
-            self.t_increment += 1/30
             print("failed to detect marker")
 
     def normalize_signals(self):
