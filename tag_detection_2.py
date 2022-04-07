@@ -28,6 +28,8 @@ class Geneva:
         self.t = []
         self.theta_norm = []
 
+        self.plot_count = 0
+
     def get_dict(self):
         super().__init__()
         if self.tag_type == 'aruco_4x4':
@@ -151,7 +153,7 @@ class Geneva:
     def corner_point_video(self):
         for i, p in enumerate(self.x):
             for j in range(4):
-                cv2.circle(self.image[i], (p[j], self.y[i][j]), 10, (255, 0, 0))
+                cv2.circle(self.image[i], (p[j], self.y[i][j]), 5, (240, 240, 0),2)
             cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255))
         height, width, layers = self.image[0].shape
         size = (width, height)
@@ -189,10 +191,15 @@ class Geneva:
         combined = np.average(sig, 1)
         return combined
 
-    def plot_signal(self, sig=None):
+    def plot_signal(self, sig=None, title="", xlabel="", ylabel=""):
         if sig is None:
             sig = self.theta_norm
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(self.t, sig)
-        plt.xlabel('t')
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.savefig(f'graphics/plots/plot{self.plot_count}.png')
+        self. plot_count += 1
+
