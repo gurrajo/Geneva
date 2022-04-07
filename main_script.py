@@ -5,11 +5,29 @@ import tag_detection_2
 import requests
 import time
 import matplotlib.pyplot as plt
+from subprocess import check_output
+import re
 
+pts = str(check_output('ffmpeg -i graphics\model_1_4k.mp4 -vf select="eq(pict_type\,I)" -an -vsync 0  keyframes%03d.jpg -loglevel debug 2>&1 |findstr select:1  ',shell=True),'utf-8')  # ffmpeg call
+pts_I = [float(i) for i in re.findall(r"\bpts:(\d+\.\d)", pts)] # Find pattern that starts with "pts:"
+n_I = [float(i) for i in re.findall(r"\bn:(\d+\.\d)", pts)] # Find pattern that starts with "n:"
+n_I = [int(i) for i in n_I]
+
+pts = str(check_output('ffmpeg -i graphics\model_1_4k.mp4 -vf select="eq(pict_type\,P)" -an -vsync 0  keyframes%03d.jpg -loglevel debug 2>&1 |findstr select:1  ',shell=True),'utf-8')  # ffmpeg call
+pts_P = [float(i) for i in re.findall(r"\bpts:(\d+\.\d)", pts)] # Find pattern that starts with "pts:"
+n_P = [float(i) for i in re.findall(r"\bn:(\d+\.\d)", pts)] # Find pattern that starts with "n:"
+n_P = [int(i) for i in n_P]
+
+t = np.zeros((len(n_P) + len(n_I),1))
+
+for i, n in enumerate(n_P):
+    t[n] = pts_P[i]*1E-3  # seconds
+
+for i, n in enumerate(n_I):
+    t[n] = pts_I[i]*1E-3  # seconds
 
 tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
-t = vidcap.get(cv2.CAP_PROP_POS_MSEC) * 1e-3  # timestamp
 success, image = vidcap.read()
 count = 0
 c_point = 0  # defines which corner to evaluate
@@ -19,8 +37,7 @@ while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
     if success:
-        geneva_object_0.detect_tags(image, t)
-        t = vidcap.get(cv2.CAP_PROP_POS_MSEC) * 1e-3  # timestamp
+        geneva_object_0.detect_tags(image, t[count][0])
     if count == 1000 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
     success, image = vidcap.read()
@@ -51,5 +68,9 @@ geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_
 geneva_object_0.plot_signal(combined,xlabel='t',ylabel='angle',title='angle combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='angular velocity',title='derivative of combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='angular acceleration',title='second derivative of combined')
-
+fig1, ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20, bottom=0.20)
+print(len(geneva_object_0.t))
+t_diff = np.diff(geneva_object_0.t)
+plt.plot(range(len(t_diff)), t_diff)
 plt.show()
