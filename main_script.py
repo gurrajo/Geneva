@@ -21,10 +21,10 @@ n_P = [int(i) for i in n_P]
 t = np.zeros((len(n_P) + len(n_I),1))
 
 for i, n in enumerate(n_P):
-    t[n] = pts_P[i]*1E-3  # seconds
+    t[n] = pts_P[i]*1E-5  # seconds
 
 for i, n in enumerate(n_I):
-    t[n] = pts_I[i]*1E-3  # seconds
+    t[n] = pts_I[i]*1E-5  # seconds
 
 tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
@@ -70,7 +70,29 @@ geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='an
 geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='angular acceleration',title='second derivative of combined')
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
-print(len(geneva_object_0.t))
 t_diff = np.diff(geneva_object_0.t)
 plt.plot(range(len(t_diff)), t_diff)
+plt.title('time-difference between frames')
+plt.xlabel('frame index')
+plt.ylabel('seconds')
+plt.savefig(f'graphics/plots/plot_time_diff.png')
+
+fig1, ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20, bottom=0.20)
+t_diff = np.diff(geneva_object_0.t)
+plt.plot(range(len(t_diff)), t_diff)
+plt.title('time-difference between frames')
+plt.xlabel('frame index')
+plt.ylabel('seconds')
+plt.xlim([28, 37])
+plt.ylim([0.03, 0.0305])
+plt.savefig(f'graphics/plots/plot_time_diff_zoom.png')
+
+fig1, ax1 = plt.subplots()
+plt.subplots_adjust(left=0.20, bottom=0.20)
+plt.plot(range(len(geneva_object_0.t)), geneva_object_0.t)
+plt.title('time of each frames')
+plt.xlabel('frame index')
+plt.ylabel('seconds')
+plt.savefig(f'graphics/plots/plot_time.png')
 plt.show()
