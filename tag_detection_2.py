@@ -9,8 +9,9 @@ class Geneva:
     """
     Object representing a geneva drive
     """
-    def __init__(self, tag_type):
+    def __init__(self, tag_type, tag_id):
         self.image = []
+        self.tag_id = tag_id
         self.tag_type = tag_type
         self.dict = self.get_dict()
         self.ids = []
@@ -50,15 +51,16 @@ class Geneva:
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
         corners = np.array(corners)
-
-        if corners.any():
-            points = corners[0][0]  # use only first marker (should only be one)
-            self.x.append(points[:, 0])
-            self.y.append(points[:, 1])
-            self.corners = corners  # keeps only the latest corner for plotting purposes
-            self.ids = ids  # keeps only the latest corner for plotting purposes
-            self.t.append(t)
-            self.image.append(image)
+        if bool(list(ids)):
+            for i, tag_id in enumerate(ids):
+                if tag_id == self.tag_id:
+                    points = corners[0][i]
+                    self.x.append(points[:, 0])
+                    self.y.append(points[:, 1])
+                    self.corners = corners  # keeps only the latest corner for plotting purposes
+                    self.ids = ids  # keeps only the latest ids for plotting purposes
+                    self.t.append(t)
+                    self.image.append(image)
         else:
             print("failed to detect marker")
 
