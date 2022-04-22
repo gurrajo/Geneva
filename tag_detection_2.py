@@ -54,7 +54,7 @@ class Geneva:
         if bool(list(ids)):
             for i, tag_id in enumerate(ids):
                 if tag_id == self.tag_id:
-                    points = corners[0][i]
+                    points = corners[i][0]
                     self.x.append(points[:, 0])
                     self.y.append(points[:, 1])
                     self.corners = corners  # keeps only the latest corner for plotting purposes
@@ -96,10 +96,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[10][0]
-        y_1 = self.y[10][0]
-        x_2 = self.x[60][0]  # points not to close to one another
-        y_2 = self.y[60][0]
+        x_1 = self.x[int((len(self.x)/4))][0]
+        y_1 = self.y[int((len(self.x)/4))][0]
+        x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
+        y_2 = self.y[int((len(self.x)*3/4))][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -111,10 +111,10 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[10][1]
-        y_1 = self.y[10][1]
-        x_2 = self.x[60][1]
-        y_2 = self.y[60][1]
+        x_1 = self.x[int((len(self.x)/4))][1]
+        y_1 = self.y[int((len(self.x)/4))][1]
+        x_2 = self.x[int((len(self.x)*3/4))][1]
+        y_2 = self.y[int((len(self.x)*3/4))][1]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -126,12 +126,11 @@ class Geneva:
         b_2 = [100, f_2(100)]
         (self.x_c, self.y_c) = get_intersect(a_1, a_2, b_1, b_2)
         image = cv2.line(image, (0, int(f_2(0))), (4000, int(f_2(4000))), (0, 0, 0))
-        #cv2.imshow('Intersection', image)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+        cv2.imshow('Intersection', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-        print(self.x_c)
-        print(self.y_c)
+        return self.x_c, self.y_c
 
     def find_angles(self):
         x = np.subtract(self.x, self.x_c)

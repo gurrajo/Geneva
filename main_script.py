@@ -5,29 +5,23 @@ import tag_detection_2
 import requests
 import time
 import matplotlib.pyplot as plt
-from subprocess import check_output
+import os
 import re
 
-pts = str(check_output('ffmpeg -i graphics\model_1_4k.mp4 -vf select="eq(pict_type\,I)" -an -vsync 0  keyframes%03d.jpg -loglevel debug 2>&1 |findstr select:1  ',shell=True),'utf-8')  # ffmpeg call
-pts_I = [float(i) for i in re.findall(r"\bpts:(\d+\.\d)", pts)] # Find pattern that starts with "pts:"
-n_I = [float(i) for i in re.findall(r"\bn:(\d+\.\d)", pts)] # Find pattern that starts with "n:"
-n_I = [int(i) for i in n_I]
+#os.system('ffmpeg -hide_banner -i graphics\model_test4.mp4 -filter:v showinfo -y > info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
 
-pts = str(check_output('ffmpeg -i graphics\model_1_4k.mp4 -vf select="eq(pict_type\,P)" -an -vsync 0  keyframes%03d.jpg -loglevel debug 2>&1 |findstr select:1  ',shell=True),'utf-8')  # ffmpeg call
-pts_P = [float(i) for i in re.findall(r"\bpts:(\d+\.\d)", pts)] # Find pattern that starts with "pts:"
-n_P = [float(i) for i in re.findall(r"\bn:(\d+\.\d)", pts)] # Find pattern that starts with "n:"
-n_P = [int(i) for i in n_P]
-
-t = np.zeros((len(n_P) + len(n_I),1))
-
-for i, n in enumerate(n_P):
-    t[n] = pts_P[i]*1E-5  # seconds
-
-for i, n in enumerate(n_I):
-    t[n] = pts_I[i]*1E-5  # seconds
-
+# Open a file: file
+file = open('info.txt', mode='r')
+t = [0]
+for line in file:
+    pts_P = re.findall(r"\spts_time:(\d\.\d+)", line) # Find pattern that starts with "pts:"
+    if pts_P:
+        t.append(float(pts_P[0]))
+print(len(t))
+# close the file
+file.close()
 tag_type = 'aruco_4x4'
-vidcap = cv2.VideoCapture('graphics/model_1_4k.mp4')
+vidcap = cv2.VideoCapture('graphics/model_test4.mp4')
 success, image = vidcap.read()
 count = 0
 geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0)
@@ -37,15 +31,15 @@ while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
     if success:
-        geneva_object_0.detect_tags(image, t[count][0])
-        geneva_object_1.detect_tags(image, t[count][0])
-        geneva_object_2.detect_tags(image, t[count][0])
+        geneva_object_0.detect_tags(image, t[count])
+        geneva_object_1.detect_tags(image, t[count])
+        geneva_object_2.detect_tags(image, t[count])
     if count == 1000 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
     success, image = vidcap.read()
     print('Read a new frame: ', success)
     count += 1
-geneva_object_0.find_center()
+rot_c_x, rot_c_y = geneva_object_0.find_center()
 geneva_object_0.find_angles()
 geneva_object_0.corner_point_video()
 geneva_object_0.normalize_signals()
