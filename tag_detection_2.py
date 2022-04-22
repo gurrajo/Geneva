@@ -118,6 +118,7 @@ class Geneva:
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
+
         def f_2(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
 

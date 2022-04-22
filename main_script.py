@@ -33,7 +33,6 @@ count = 0
 geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0)
 geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1)
 geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2)
-
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
