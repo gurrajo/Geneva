@@ -4,10 +4,16 @@ import tag_detection_2
 import matplotlib.pyplot as plt
 import os
 import re
-filename = 'model_test8.mp4'
+import glob
 
-#os.system(f'ffmpeg -hide_banner -i graphics/{filename} -filter:v showinfo -y > graphics/time/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
-
+filename = 'model_test1.mp4'
+first_time = True  # false when time info text file exists
+if first_time:
+    os.system(f'ffmpeg -hide_banner -i graphics/{filename} -filter:v showinfo -y > graphics/time/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
+    # remove junk files
+    files = glob.glob('graphics/junk/*')
+    for f in files:
+        os.remove(f)
 # Open a file: file
 file = open(f'graphics/time/{filename}info.txt', mode='r')
 t = [0]
