@@ -7,26 +7,28 @@ import time
 import matplotlib.pyplot as plt
 import os
 import re
+filename = 'model_test5.mp4'
 
-#os.system('ffmpeg -hide_banner -i graphics\model_test4.mp4 -filter:v showinfo -y > info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
+#os.system(f'ffmpeg -hide_banner -i {filename} -filter:v showinfo -y > graphics/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
 
 # Open a file: file
-file = open('info.txt', mode='r')
+file = open(f'graphics/{filename}info.txt', mode='r')
 t = [0]
 for line in file:
-    pts_P = re.findall(r"\spts_time:(\d\.\d+)", line) # Find pattern that starts with "pts:"
+    pts_P = re.findall(r"\spts_time:(\d+\.\d+)", line) # Find pattern that starts with "pts_time:"
     if pts_P:
         t.append(float(pts_P[0]))
 print(len(t))
 # close the file
 file.close()
 tag_type = 'aruco_4x4'
-vidcap = cv2.VideoCapture('graphics/model_test4.mp4')
+
+vidcap = cv2.VideoCapture(f'graphics/{filename}')
 success, image = vidcap.read()
 count = 0
-geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0)
-geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1)
-geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2)
+geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0, filename=filename)
+geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1, filename=filename)
+geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename)
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
@@ -64,6 +66,8 @@ geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_
 geneva_object_0.plot_signal(combined,xlabel='t',ylabel='angle',title='angle combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='angular velocity',title='derivative of combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='angular acceleration',title='second derivative of combined')
+
+
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
 t_diff = np.diff(geneva_object_0.t)

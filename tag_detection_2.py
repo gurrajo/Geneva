@@ -9,7 +9,8 @@ class Geneva:
     """
     Object representing a geneva drive
     """
-    def __init__(self, tag_type, tag_id):
+    def __init__(self, tag_type, tag_id, filename):
+        self.filename = filename
         self.image = []
         self.tag_id = tag_id
         self.tag_type = tag_type
@@ -126,9 +127,9 @@ class Geneva:
         b_2 = [100, f_2(100)]
         (self.x_c, self.y_c) = get_intersect(a_1, a_2, b_1, b_2)
         image = cv2.line(image, (0, int(f_2(0))), (4000, int(f_2(4000))), (0, 0, 0))
-        cv2.imshow('Intersection', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.imshow('Intersection', image)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
         return self.x_c, self.y_c
 
@@ -159,7 +160,7 @@ class Geneva:
             cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255))
         height, width, layers = self.image[0].shape
         size = (width, height)
-        out = cv2.VideoWriter('project.avi', cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
+        out = cv2.VideoWriter(f'graphics/vids/{self.filename}_{self.tag_id}_.avi', cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
         for i in range(len(self.image)):
             out.write(self.image[i])
         out.release()
