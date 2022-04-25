@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import sympy
 from scipy import signal
 
 
@@ -161,6 +160,7 @@ class Geneva:
         height, width, layers = self.image[0].shape
         size = (width, height)
         out = cv2.VideoWriter(f'graphics/vids/{self.filename}_{self.tag_id}_.avi', cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
+        print(len(self.image))
         for i in range(len(self.image)):
             out.write(self.image[i])
         out.release()

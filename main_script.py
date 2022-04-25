@@ -1,26 +1,23 @@
-
 import numpy as np
 import cv2
 import tag_detection_2
-import requests
-import time
 import matplotlib.pyplot as plt
 import os
 import re
-filename = 'model_test5.mp4'
+filename = 'model_test8.mp4'
 
-#os.system(f'ffmpeg -hide_banner -i {filename} -filter:v showinfo -y > graphics/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
+#os.system(f'ffmpeg -hide_banner -i graphics/{filename} -filter:v showinfo -y > graphics/time/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
 
 # Open a file: file
-file = open(f'graphics/{filename}info.txt', mode='r')
+file = open(f'graphics/time/{filename}info.txt', mode='r')
 t = [0]
 for line in file:
     pts_P = re.findall(r"\spts_time:(\d+\.\d+)", line) # Find pattern that starts with "pts_time:"
     if pts_P:
         t.append(float(pts_P[0]))
 print(len(t))
-# close the file
-file.close()
+
+file.close()  # close the file
 tag_type = 'aruco_4x4'
 
 vidcap = cv2.VideoCapture(f'graphics/{filename}')
@@ -32,6 +29,8 @@ geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename)
 while success:
     fname = f'graphics/cv/frame{count}.jpg'
     # cv2.imwrite(fname, image)  # save frame as JPEG file
+    if count == len(t):
+        break
     if success:
         geneva_object_0.detect_tags(image, t[count])
         geneva_object_1.detect_tags(image, t[count])
