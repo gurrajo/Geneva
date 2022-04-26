@@ -52,7 +52,7 @@ class Geneva:
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
         corners = np.array(corners)
-        if bool(list(ids)):
+        if ids is not None:
             for i, tag_id in enumerate(ids):
                 if tag_id == self.tag_id:
                     points = corners[i][0]
