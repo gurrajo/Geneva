@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 import os
 import re
 import glob
-
-filename = 'model_test1.mp4'
-first_time = True  # false when time info text file exists
+test_nr = 4
+filename = f'model_test{test_nr}.mp4'
+first_time = False  # False if time info text file exists
 if first_time:
     os.system(f'ffmpeg -hide_banner -i graphics/{filename} -filter:v showinfo -y > graphics/time/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
     # remove junk files
     files = glob.glob('graphics/junk/*')
     for f in files:
         os.remove(f)
-# Open a file: file
+
 file = open(f'graphics/time/{filename}info.txt', mode='r')
 t = [0]
 for line in file:
@@ -29,14 +29,10 @@ tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture(f'graphics/{filename}')
 success, image = vidcap.read()
 count = 0
-geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0, filename=filename)
+geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename, rot_dir='CW', test_nr=test_nr)
 geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1, filename=filename)
 geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename)
 while success:
-    fname = f'graphics/cv/frame{count}.jpg'
-    # cv2.imwrite(fname, image)  # save frame as JPEG file
-    if count == len(t):
-        break
     if success:
         geneva_object_0.detect_tags(image, t[count])
         geneva_object_1.detect_tags(image, t[count])
@@ -48,7 +44,7 @@ while success:
     count += 1
 rot_c_x, rot_c_y = geneva_object_0.find_center()
 geneva_object_0.find_angles()
-geneva_object_0.corner_point_video()
+#geneva_object_0.corner_point_video()
 geneva_object_0.normalize_signals()
 geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
 geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)

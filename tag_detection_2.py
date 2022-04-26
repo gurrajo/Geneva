@@ -8,7 +8,8 @@ class Geneva:
     """
     Object representing a geneva drive
     """
-    def __init__(self, tag_type, tag_id, filename):
+    def __init__(self, tag_type, tag_id, filename, rot_dir='CCW', test_nr=0):
+        self.test_nr = test_nr
         self.filename = filename
         self.image = []
         self.tag_id = tag_id
@@ -16,7 +17,7 @@ class Geneva:
         self.dict = self.get_dict()
         self.ids = []
         self.corners = []
-        self.rot_dir = 'CCW'  # or CW
+        self.rot_dir = rot_dir  # or CW
         self.frame_remove = 7  # number of end frames to remove
 
         self.x = []  # x values of marker corners
@@ -111,10 +112,10 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[int((len(self.x)/4))][1]
-        y_1 = self.y[int((len(self.x)/4))][1]
-        x_2 = self.x[int((len(self.x)*3/4))][1]
-        y_2 = self.y[int((len(self.x)*3/4))][1]
+        x_1 = self.x[int((len(self.x)/4))][2]
+        y_1 = self.y[int((len(self.x)/4))][2]
+        x_2 = self.x[int((len(self.x)*3/4))][2]
+        y_2 = self.y[int((len(self.x)*3/4))][2]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -203,6 +204,5 @@ class Geneva:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
-        plt.savefig(f'graphics/plots/plot{self.plot_count}.png')
+        plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.png')
         self. plot_count += 1
-
