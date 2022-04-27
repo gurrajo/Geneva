@@ -8,7 +8,8 @@ class Geneva:
     """
     Object representing a geneva drive
     """
-    def __init__(self, tag_type, tag_id, filename):
+    def __init__(self, tag_type, tag_id, filename, rot_dir='CCW', test_nr=0):
+        self.test_nr = test_nr
         self.filename = filename
         self.image = []
         self.tag_id = tag_id
@@ -16,7 +17,7 @@ class Geneva:
         self.dict = self.get_dict()
         self.ids = []
         self.corners = []
-        self.rot_dir = 'CCW'  # or CW
+        self.rot_dir = rot_dir  # or CW
         self.frame_remove = 7  # number of end frames to remove
 
         self.x = []  # x values of marker corners
@@ -51,7 +52,7 @@ class Geneva:
         aruco_parameters = cv2.aruco.DetectorParameters_create()
         corners, ids, rejected_img_points = cv2.aruco.detectMarkers(gray, self.dict, parameters=aruco_parameters)
         corners = np.array(corners)
-        if bool(list(ids)):
+        if ids is not None:
             for i, tag_id in enumerate(ids):
                 if tag_id == self.tag_id:
                     points = corners[i][0]
@@ -96,8 +97,8 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[int((len(self.x)/4))][0]
-        y_1 = self.y[int((len(self.x)/4))][0]
+        x_1 = self.x[int((len(self.x)/2))][0]
+        y_1 = self.y[int((len(self.x)/2))][0]
         x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
         y_2 = self.y[int((len(self.x)*3/4))][0]
 
@@ -111,10 +112,10 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[int((len(self.x)/4))][1]
-        y_1 = self.y[int((len(self.x)/4))][1]
-        x_2 = self.x[int((len(self.x)*3/4))][1]
-        y_2 = self.y[int((len(self.x)*3/4))][1]
+        x_1 = self.x[int((len(self.x)/2))][2]
+        y_1 = self.y[int((len(self.x)/2))][2]
+        x_2 = self.x[int((len(self.x)*3/4))][2]
+        y_2 = self.y[int((len(self.x)*3/4))][2]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -151,6 +152,18 @@ class Geneva:
         for i in range(self.frame_remove):  # remove unwanted last values
             self.theta = np.delete(self.theta, [-1], 0)
             del self.t[-1]
+
+    def vibration_study(self, time_interval):
+        start_diff = np.absolute(np.subtract(self.t, time_interval[0]))
+        stop_diff = np.absolute(np.subtract(self.t, time_interval[1]))
+        start = start_diff.argmin()
+        stop = stop_diff.argmin()
+        x_list = self.x[start:stop]
+        y_list = self.y[start:stop]
+        x_list = np.subtract(x_list, x_list[:][0])
+        y_list = np.subtract(y_list, y_list[:][0])
+        t_list = self.t[start:stop]
+        return x_list, y_list, t_list
 
     def corner_point_video(self):
         for i, p in enumerate(self.x):
@@ -194,15 +207,16 @@ class Geneva:
         combined = np.average(sig, 1)
         return combined
 
-    def plot_signal(self, sig=None, title="", xlabel="", ylabel=""):
+    def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel=""):
         if sig is None:
             sig = self.theta_norm
+        if t is None:
+            t = self.t
         fig1, ax1 = plt.subplots()
         plt.subplots_adjust(left=0.20, bottom=0.20)
-        plt.plot(self.t, sig)
+        plt.plot(t, sig)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
-        plt.savefig(f'graphics/plots/plot{self.plot_count}.png')
+        plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.png')
         self. plot_count += 1
-
