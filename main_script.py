@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import os
 import re
 import glob
-test_nr = 13
+test_nr = 4
 filename = f'model_test{test_nr}.mp4'
-first_time = True  # False if time info text file exists
+first_time = False  # False if time info text file exists
 if first_time:
     os.system(f'ffmpeg -hide_banner -i graphics/{filename} -filter:v showinfo -y > graphics/time/{filename}info.txt 2>&1 graphics\junk\output%d.png')  # write text file with video metadata
     # remove junk files
@@ -29,7 +29,7 @@ tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture(f'graphics/{filename}')
 success, image = vidcap.read()
 count = 0
-geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename, rot_dir='CCW', test_nr=test_nr)
+geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename, rot_dir='CW', test_nr=test_nr)
 geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1, filename=filename)
 geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename)
 while success:
@@ -69,6 +69,11 @@ geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_
 geneva_object_0.plot_signal(combined,xlabel='t',ylabel='angle',title='angle combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='angular velocity',title='derivative of combined')
 geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='angular acceleration',title='second derivative of combined')
+
+x_list, y_list, t_list = geneva_object_0.vibration_study((1, 3))
+
+geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x',title='vibration study')
+geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y',title='vibration study')
 
 
 fig1, ax1 = plt.subplots()
