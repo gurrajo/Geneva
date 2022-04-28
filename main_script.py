@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import re
 import glob
-test_nr = 4
+test_nr = 3
 filename = f'model_test{test_nr}.mp4'
 first_time = False  # False if time info text file exists
 if first_time:
@@ -29,7 +29,7 @@ tag_type = 'aruco_4x4'
 vidcap = cv2.VideoCapture(f'graphics/{filename}')
 success, image = vidcap.read()
 count = 0
-geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename, rot_dir='CW', test_nr=test_nr)
+geneva_object_0 = tag_detection_2.Geneva(tag_type, tag_id=0, filename=filename, rot_dir='CCW', test_nr=test_nr)
 geneva_object_1 = tag_detection_2.Geneva(tag_type, tag_id=1, filename=filename)
 geneva_object_2 = tag_detection_2.Geneva(tag_type, tag_id=2, filename=filename)
 while success:
@@ -75,6 +75,9 @@ x_list, y_list, t_list = geneva_object_0.vibration_study((1, 3))
 geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x',title='vibration study')
 geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y',title='vibration study')
 
+dx = geneva_object_0.corners[0][0][0][0]-geneva_object_0.corners[0][0][1][0]
+dy = geneva_object_0.corners[0][0][0][1]-geneva_object_0.corners[0][0][1][1]
+print(np.sqrt(dx**2+dy**2))
 
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)

@@ -97,8 +97,8 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[int((len(self.x)/2))][0]
-        y_1 = self.y[int((len(self.x)/2))][0]
+        x_1 = self.x[int((len(self.x)/4))][0]
+        y_1 = self.y[int((len(self.x)/4))][0]
         x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
         y_2 = self.y[int((len(self.x)*3/4))][0]
 
@@ -112,8 +112,8 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[int((len(self.x)/2))][2]
-        y_1 = self.y[int((len(self.x)/2))][2]
+        x_1 = self.x[int((len(self.x)/4))][2]
+        y_1 = self.y[int((len(self.x)/4))][2]
         x_2 = self.x[int((len(self.x)*3/4))][2]
         y_2 = self.y[int((len(self.x)*3/4))][2]
 
