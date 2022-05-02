@@ -18,15 +18,18 @@ class Geneva:
         self.ids = []
         self.corners = []
         self.rot_dir = rot_dir  # or CW
-        self.frame_remove = 7  # number of end frames to remove
+        self.frame_remove = 5  # number of end frames to remove
 
         self.x = []  # x values of marker corners
         self.y = []  # y values of marker corners
         self.x_c = []  # x and y of center
         self.y_c = []
+        self.mc_x = []
+        self.mc_y = []
         self.theta = []
         self.theta_dot = []
         self.theta_bis = []
+        self.theta_mc = []
         self.t = []
         self.theta_norm = []
 
@@ -56,6 +59,8 @@ class Geneva:
             for i, tag_id in enumerate(ids):
                 if tag_id == self.tag_id:
                     points = corners[i][0]
+                    self.mc_x.append(np.mean(points[:, 0]))
+                    self.mc_y.append(np.mean(points[:, 1]))
                     self.x.append(points[:, 0])
                     self.y.append(points[:, 1])
                     self.corners = corners  # keeps only the latest corner for plotting purposes
@@ -97,10 +102,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[int((len(self.x)/4))][0]
-        y_1 = self.y[int((len(self.x)/4))][0]
-        x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
-        y_2 = self.y[int((len(self.x)*3/4))][0]
+        x_1 = self.x[int((len(self.x)/2))][0]
+        y_1 = self.y[int((len(self.x)/2))][0]
+        x_2 = self.x[int((len(self.x)*1/4))][0]  # points not to close to one another
+        y_2 = self.y[int((len(self.x)*1/4))][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -112,8 +117,8 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[int((len(self.x)/4))][2]
-        y_1 = self.y[int((len(self.x)/4))][2]
+        x_1 = self.x[int((len(self.x)/2))][2]
+        y_1 = self.y[int((len(self.x)/2))][2]
         x_2 = self.x[int((len(self.x)*3/4))][2]
         y_2 = self.y[int((len(self.x)*3/4))][2]
 
@@ -148,8 +153,20 @@ class Geneva:
                 elif self.rot_dir == 'CCW' and ang > 0 and self.theta[j-1,i] < 0:
                     self.theta[j:-1, i] -= np.pi * 2
                     break
+        x = np.subtract(self.mc_x, self.x_c)
+        y = np.subtract(self.mc_y, self.y_c)
+        self.theta_mc = np.arctan2(y, x)
+        for i in range(len(self.theta_mc)):
+            ang = self.theta_mc[i]
+            if self.rot_dir == 'CW' and ang < 0 and self.theta_mc[i - 1] > 0:
+                self.theta_mc[i:-1] += np.pi * 2
+                break
+            elif self.rot_dir == 'CCW' and ang > 0 and self.theta_mc[i - 1] < 0:
+                self.theta_mc[i:-1] -= np.pi * 2
+                break
 
         for i in range(self.frame_remove):  # remove unwanted last values
+            self.theta_mc = np.delete(self.theta_mc, [-1], 0)
             self.theta = np.delete(self.theta, [-1], 0)
             del self.t[-1]
 
@@ -168,8 +185,9 @@ class Geneva:
     def corner_point_video(self):
         for i, p in enumerate(self.x):
             for j in range(4):
-                cv2.circle(self.image[i], (p[j], self.y[i][j]), 5, (240, 240, 0),2)
-            cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255))
+                cv2.circle(self.image[i], (p[j], self.y[i][j]), 5, (240, 240, 0), 2)
+            cv2.circle(self.image[i], (self.x_c, self.y_c), 10, (0, 255, 255), 2)
+            cv2.circle(self.image[i], (self.mc_x[i], self.mc_y[i]), 7, (255, 0, 100), 3)
         height, width, layers = self.image[0].shape
         size = (width, height)
         out = cv2.VideoWriter(f'graphics/vids/{self.filename}_{self.tag_id}_.avi', cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
@@ -206,6 +224,11 @@ class Geneva:
             sig = self.theta_norm
         combined = np.average(sig, 1)
         return combined
+
+    def data_to_text(self, data, fname):
+        with open(f"data/{fname}.txt", 'w') as f:
+            for i, dat in enumerate(data):
+                f.write(str(dat) + " " + str(self.t[i]) + "\n")
 
     def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel=""):
         if sig is None:
