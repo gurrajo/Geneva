@@ -77,9 +77,9 @@ print(np.sqrt(dx**2+dy**2))
 
 geneva_object_0.theta_mc_dot = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc)
 geneva_object_0.theta_mc_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc_dot)
-geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='theta', title='maker center theta')
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='theta', title='maker center theta dot')
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='theta', title='maker center theta bis')
+geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center theta')
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='rad/sec', title='maker center theta dot')
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='rad/sec^2', title='maker center theta bis')
 #geneva_object_0.data_to_text(geneva_object_0.theta, 'theta')
 
 fig1, ax1 = plt.subplots()
