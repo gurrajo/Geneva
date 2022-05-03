@@ -226,20 +226,28 @@ class Geneva:
         return combined
 
     def data_to_text(self, data, fname):
-        with open(f"data/{fname}.txt", 'w') as f:
+        with open(f"data/{fname}_{self.test_nr}.txt", 'w') as f:
             for i, dat in enumerate(data):
                 f.write(str(dat) + " " + str(self.t[i]) + "\n")
 
-    def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel=""):
+    def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel="", xlim=None, ylim=None):
         if sig is None:
             sig = self.theta_norm
         if t is None:
             t = self.t
+        if xlim is None:
+            xlim = [min(t), max(t)]
+        if ylim is None:
+            temp = np.matrix(sig)
+            ylim = [temp.min(), temp.max()]
         fig1, ax1 = plt.subplots()
+        plt.xlim(xlim)
+        plt.ylim(ylim)
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(t, sig)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
+        plt.grid()
         plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.png')
         self. plot_count += 1

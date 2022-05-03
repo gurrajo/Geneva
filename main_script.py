@@ -47,29 +47,29 @@ geneva_object_0.normalize_signals()
 geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
 geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)
 
-geneva_object_0.plot_signal(xlabel='t',ylabel='rad',title='angle all signals')
-geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='t',ylabel='rad/sec',title='angular velocity all signals')
-geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel='rad/sec^2',title='angular acceleration all signals')
+geneva_object_0.plot_signal(xlabel='t',ylabel='rad',title='angle all signals', xlim=[0, 24])
+geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='t',ylabel='rad/sec',title='angular velocity all signals', xlim=[0, 24], ylim=[-0.8,0.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel='rad/sec^2',title='angular acceleration all signals', xlim=[0, 24], ylim=[-17.5,17.5])
 
-geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
+# geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
+#
+# geneva_object_0.theta_dot_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_smooth)
+# geneva_object_0.theta_bis_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_smooth)
+# geneva_object_0.plot_signal(geneva_object_0.theta_smooth,xlabel='t',ylabel='rad',title='angle smoothened')
+# geneva_object_0.plot_signal(geneva_object_0.theta_dot_smooth,xlabel='t',ylabel='rad/sec',title='angular velocity smoothened')
+# geneva_object_0.plot_signal(geneva_object_0.theta_bis_smooth,xlabel='t',ylabel='rad/sec^2',title='angular acceleration smoothened')
 
-geneva_object_0.theta_dot_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_smooth)
-geneva_object_0.theta_bis_smooth = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_smooth)
-geneva_object_0.plot_signal(geneva_object_0.theta_smooth,xlabel='t',ylabel='rad',title='angle smoothened')
-geneva_object_0.plot_signal(geneva_object_0.theta_dot_smooth,xlabel='t',ylabel='rad/sec',title='angular velocity smoothened')
-geneva_object_0.plot_signal(geneva_object_0.theta_bis_smooth,xlabel='t',ylabel='rad/sec^2',title='angular acceleration smoothened')
+# combined = geneva_object_0.combine_signal()
+# geneva_object_0.theta_dot_comb = geneva_object_0.calc_derivatives(combined)
+# geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_comb)
+# geneva_object_0.plot_signal(combined,xlabel='t',ylabel='rad',title='angle combined')
+# geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='rad/sec',title='derivative of combined')
+# geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='rad/sec^2',title='second derivative of combined')
 
-combined = geneva_object_0.combine_signal()
-geneva_object_0.theta_dot_comb = geneva_object_0.calc_derivatives(combined)
-geneva_object_0.theta_bis_comb = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot_comb)
-geneva_object_0.plot_signal(combined,xlabel='t',ylabel='rad',title='angle combined')
-geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='rad/sec',title='derivative of combined')
-geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='rad/sec^2',title='second derivative of combined')
+x_list, y_list, t_list = geneva_object_0.vibration_study((7.3, 8.17))
 
-x_list, y_list, t_list = geneva_object_0.vibration_study((1, 3))
-
-geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x [pixels]',title='vibration study')
-geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y [pixels]',title='vibration study')
+geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x [pixels]',title='corner x values when stationary')
+geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y [pixels]',title='corner y values when stationary')
 
 dx = geneva_object_0.corners[0][0][0][0]-geneva_object_0.corners[0][0][1][0]
 dy = geneva_object_0.corners[0][0][0][1]-geneva_object_0.corners[0][0][1][1]
@@ -77,10 +77,10 @@ print(np.sqrt(dx**2+dy**2))
 
 geneva_object_0.theta_mc_dot = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc)
 geneva_object_0.theta_mc_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc_dot)
-geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center theta')
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='rad/sec', title='maker center theta dot')
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='rad/sec^2', title='maker center theta bis')
-#geneva_object_0.data_to_text(geneva_object_0.theta, 'theta')
+geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center theta', xlim=[0, 24],)
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='rad/sec', title='maker center theta dot', xlim=[0, 24], ylim=[-0.8,0.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='rad/sec^2', title='maker center theta bis', xlim=[0, 24], ylim=[-17.5,17.5])
+#geneva_object_0.data_to_text(geneva_object_0.theta_mc_dot, 'angular_velocity_marker_center')
 
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
