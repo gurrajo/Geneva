@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import re
 import glob
-test_nr = 8
+test_nr = 4
 filename = f'model_test{test_nr}.mp4'
 first_time = False  # False if time info text file exists
 if first_time:
@@ -42,14 +42,14 @@ while success:
     count += 1
 rot_c_x, rot_c_y = geneva_object_0.find_center()
 geneva_object_0.find_angles()
-geneva_object_0.corner_point_video()
+#geneva_object_0.corner_point_video()
 geneva_object_0.normalize_signals()
 geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
 geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)
 
-geneva_object_0.plot_signal(xlabel='t',ylabel='rad',title='angle all signals', xlim=[0, 24])
-geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='t',ylabel='rad/sec',title='angular velocity all signals', xlim=[0, 24], ylim=[-0.8,0.6])
-geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel='rad/sec^2',title='angular acceleration all signals', xlim=[0, 24], ylim=[-17.5,17.5])
+geneva_object_0.plot_signal(xlabel='t',ylabel='rad',title='angle all signals')#, xlim=[0, 24])
+geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='t',ylabel='rad/sec',title='angular velocity all signals')#, xlim=[0, 24], ylim=[-0.8,0.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel='rad/sec^2',title='angular acceleration all signals')#, xlim=[0, 24], ylim=[-17.5,17.5])
 
 # geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
 #
@@ -66,7 +66,7 @@ geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel='rad/sec
 # geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='rad/sec',title='derivative of combined')
 # geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='rad/sec^2',title='second derivative of combined')
 
-x_list, y_list, t_list = geneva_object_0.vibration_study((7.3, 8.17))
+x_list, y_list, t_list = geneva_object_0.vibration_study((1, 3))
 
 geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x [pixels]',title='corner x values when stationary')
 geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y [pixels]',title='corner y values when stationary')
@@ -77,30 +77,30 @@ print(np.sqrt(dx**2+dy**2))
 
 geneva_object_0.theta_mc_dot = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc)
 geneva_object_0.theta_mc_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc_dot)
-geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center theta', xlim=[0, 24],)
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='rad/sec', title='maker center theta dot', xlim=[0, 24], ylim=[-0.8,0.6])
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='rad/sec^2', title='maker center theta bis', xlim=[0, 24], ylim=[-17.5,17.5])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center theta')#, xlim=[0, 24])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel='rad/sec', title='maker center angular velocity')#, xlim=[0, 24], ylim=[-0.8,0.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel='rad/sec^2', title='maker center angular acceleration')#, xlim=[0, 24], ylim=[-17.5,17.5])
 #geneva_object_0.data_to_text(geneva_object_0.theta_mc_dot, 'angular_velocity_marker_center')
 
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
 t_diff = np.diff(geneva_object_0.t)
 plt.plot(range(len(t_diff)), t_diff)
-plt.title('time-difference between frames')
+plt.title('time difference between frames')
 plt.xlabel('frame index')
 plt.ylabel('seconds')
-plt.savefig(f'graphics/plots/plot_time_diff.png')
+plt.savefig(f'graphics/plots/plot_time_diff.eps')
 
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
 t_diff = np.diff(geneva_object_0.t)
 plt.plot(range(len(t_diff)), t_diff)
-plt.title('time-difference between frames')
+plt.title('time difference between frames')
 plt.xlabel('frame index')
 plt.ylabel('seconds')
-plt.xlim([28, 37])
-plt.ylim([0.03, 0.0305])
-plt.savefig(f'graphics/plots/plot_time_diff_zoom.png')
+plt.xlim([20, 70])
+plt.ylim([0.0332, 0.0338])
+plt.savefig(f'graphics/plots/plot_time_diff_zoom.eps')
 
 fig1, ax1 = plt.subplots()
 plt.subplots_adjust(left=0.20, bottom=0.20)
@@ -108,5 +108,5 @@ plt.plot(range(len(geneva_object_0.t)), geneva_object_0.t)
 plt.title('time of each frame')
 plt.xlabel('frame index')
 plt.ylabel('seconds')
-plt.savefig(f'graphics/plots/plot_time.png')
+plt.savefig(f'graphics/plots/plot_time.eps')
 plt.show()

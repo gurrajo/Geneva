@@ -175,10 +175,21 @@ class Geneva:
         stop_diff = np.absolute(np.subtract(self.t, time_interval[1]))
         start = start_diff.argmin()
         stop = stop_diff.argmin()
+        mc_x = self.mc_x[start:stop]
+        mc_y = self.mc_y[start:stop]
         x_list = self.x[start:stop]
         y_list = self.y[start:stop]
         x_list = np.subtract(x_list, x_list[:][0])
         y_list = np.subtract(y_list, y_list[:][0])
+        mc_x = np.subtract(mc_x, mc_x[0])
+        mc_y = np.subtract(mc_y, mc_y[0])
+        mc_x_list = np.zeros((len(mc_x), 1))
+        mc_y_list = np.zeros((len(mc_x), 1))
+        for i in range(len(mc_x)):
+            mc_x_list[i] = mc_x[i]
+            mc_y_list[i] = mc_y[i]
+        x_list = np.hstack((x_list, mc_x_list))
+        y_list = np.hstack((y_list, mc_y_list))
         t_list = self.t[start:stop]
         return x_list, y_list, t_list
 
@@ -249,5 +260,5 @@ class Geneva:
         plt.ylabel(ylabel)
         plt.title(title)
         plt.grid()
-        plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.png')
+        plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.eps')
         self. plot_count += 1
