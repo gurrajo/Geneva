@@ -102,10 +102,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[int((len(self.x)/2))][0]
-        y_1 = self.y[int((len(self.x)/2))][0]
-        x_2 = self.x[int((len(self.x)*1/4))][0]  # points not to close to one another
-        y_2 = self.y[int((len(self.x)*1/4))][0]
+        x_1 = self.x[int((len(self.x)/4))][0]
+        y_1 = self.y[int((len(self.x)/4))][0]
+        x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
+        y_2 = self.y[int((len(self.x)*3/4))][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -117,8 +117,8 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.x[int((len(self.x)/2))][2]
-        y_1 = self.y[int((len(self.x)/2))][2]
+        x_1 = self.x[int((len(self.x)/4))][2]
+        y_1 = self.y[int((len(self.x)/4))][2]
         x_2 = self.x[int((len(self.x)*3/4))][2]
         y_2 = self.y[int((len(self.x)*3/4))][2]
 
@@ -257,7 +257,7 @@ class Geneva:
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(t, sig)
         plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
+        plt.ylabel(ylabel, rotation=0)
         plt.title(title)
         plt.grid()
         plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.eps')
