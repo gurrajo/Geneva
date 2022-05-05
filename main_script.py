@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import re
 import glob
-test_nr = 4
+test_nr = 8
 filename = f'model_test{test_nr}.mp4'
 first_time = False  # False if time info text file exists
 if first_time:
@@ -35,7 +35,7 @@ while success:
         break
     if success:
         geneva_object_0.detect_tags(image, t[count])
-    if count == 1000 or count == 7800:  # shows marker detection
+    if count == 99 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
     success, image = vidcap.read()
     print('Read a new frame: ', success)
@@ -47,9 +47,9 @@ geneva_object_0.normalize_signals()
 geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
 geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)
 
-geneva_object_0.plot_signal(xlabel='t',ylabel='rad',title='angle corners')#, xlim=[0, 24])
-geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='t',ylabel=r'$\frac{rad}{s}$',title='angular velocity corners')#, xlim=[0, 24], ylim=[-0.8,0.6])
-geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel=r'$\frac{rad}{s^2}$',title='angular acceleration corners')#, xlim=[0, 24], ylim=[-17.5,17.5])
+geneva_object_0.plot_signal(xlabel='time [sec]',ylabel='rad',title='angle corners', xlim=[0, 8.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='time [sec]',ylabel=r'$\frac{rad}{s}$',title='angular velocity corners', xlim=[0, 8.6], ylim=[-0.8,0.2])
+geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='time [sec]',ylabel=r'$\frac{rad}{s^2}$',title='angular acceleration corners', xlim=[0, 8.6], ylim=[-12.75,12.75])
 
 # geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
 #
@@ -66,20 +66,24 @@ geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='t',ylabel=r'$\frac
 # geneva_object_0.plot_signal(geneva_object_0.theta_dot_comb,xlabel='t',ylabel='rad/sec',title='derivative of combined')
 # geneva_object_0.plot_signal(geneva_object_0.theta_bis_comb,xlabel='t',ylabel='rad/sec^2',title='second derivative of combined')
 
-x_list, y_list, t_list = geneva_object_0.vibration_study((1, 3))
+x_list, y_list, t_list = geneva_object_0.vibration_study((3.2, 3.8))
 
-geneva_object_0.plot_signal(x_list, t=t_list, xlabel='t',ylabel='x',title='corner x values when stationary')
-geneva_object_0.plot_signal(y_list, t=t_list, xlabel='t',ylabel='y',title='corner y values when stationary')
+geneva_object_0.plot_signal(x_list, t=t_list, xlabel='time [sec]',ylabel='x',title='x values when stationary', legend=["Corner 0","Corner 1","Corner 2","Corner 3","Marker center"])
+geneva_object_0.plot_signal(y_list, t=t_list, xlabel='time [sec]',ylabel='y',title='y values when stationary', legend=["Corner 0","Corner 1","Corner 2","Corner 3","Marker center"])
 
-dx = geneva_object_0.corners[0][0][0][0]-geneva_object_0.corners[0][0][1][0]
-dy = geneva_object_0.corners[0][0][0][1]-geneva_object_0.corners[0][0][1][1]
+dx = geneva_object_0.x[30][0]-geneva_object_0.x[30][1]
+dy = geneva_object_0.y[30][0]-geneva_object_0.y[30][1]
+print(np.sqrt(dx**2+dy**2))
+
+dx = geneva_object_0.x[30][1]-geneva_object_0.x[30][2]
+dy = geneva_object_0.y[30][1]-geneva_object_0.y[30][2]
 print(np.sqrt(dx**2+dy**2))
 
 geneva_object_0.theta_mc_dot = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc)
 geneva_object_0.theta_mc_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc_dot)
-geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='t', ylabel='rad', title='maker center angle')#, xlim=[0, 24])
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='t', ylabel=r'$\frac{rad}{s}$', title='maker center angular velocity')#, xlim=[0, 24], ylim=[-0.8,0.6])
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='t', ylabel=r'$\frac{rad}{s^2}$', title='maker center angular acceleration')#, xlim=[0, 24], ylim=[-17.5,17.5])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='time [sec]', ylabel='rad', title='maker center angle', xlim=[0, 8.6])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='time [sec]', ylabel=r'$\frac{rad}{s}$', title='maker center angular velocity', xlim=[0, 8.6], ylim=[-0.8,0.2])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='time [sec]', ylabel=r'$\frac{rad}{s^2}$', title='maker center angular acceleration', xlim=[0, 8.6], ylim=[-12.75,12.75])
 #geneva_object_0.data_to_text(geneva_object_0.theta_mc_dot, 'angular_velocity_marker_center')
 
 fig1, ax1 = plt.subplots()

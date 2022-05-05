@@ -102,8 +102,8 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.x[int((len(self.x)/4))][0]
-        y_1 = self.y[int((len(self.x)/4))][0]
+        x_1 = self.x[int((len(self.x)/2))][0]
+        y_1 = self.y[int((len(self.x)/2))][0]
         x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
         y_2 = self.y[int((len(self.x)*3/4))][0]
 
@@ -241,7 +241,8 @@ class Geneva:
             for i, dat in enumerate(data):
                 f.write(str(dat) + " " + str(self.t[i]) + "\n")
 
-    def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel="", xlim=None, ylim=None):
+    def plot_signal(self, sig=None, t=None, title="", xlabel="", ylabel="", xlim=None, ylim=None, legend=None):
+
         if sig is None:
             sig = self.theta_norm
         if t is None:
@@ -259,6 +260,8 @@ class Geneva:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel, rotation=0)
         plt.title(title)
+        if legend is not None:
+            plt.legend(legend)
         plt.grid()
         plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.eps')
         self. plot_count += 1
