@@ -104,8 +104,8 @@ class Geneva:
 
         x_1 = self.x[int((len(self.x)/2))][0]
         y_1 = self.y[int((len(self.x)/2))][0]
-        x_2 = self.x[int((len(self.x)*3/4))][0]  # points not to close to one another
-        y_2 = self.y[int((len(self.x)*3/4))][0]
+        x_2 = self.x[int((len(self.x)/4))][0]  # points not to close to one another
+        y_2 = self.y[int((len(self.x)/4))][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -249,12 +249,9 @@ class Geneva:
             t = self.t
         if xlim is None:
             xlim = [min(t), max(t)]
-        if ylim is None:
-            temp = np.matrix(sig)
-            ylim = [temp.min(), temp.max()]
+
         fig1, ax1 = plt.subplots()
         plt.xlim(xlim)
-        plt.ylim(ylim)
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(t, sig)
         plt.xlabel(xlabel)
@@ -262,6 +259,16 @@ class Geneva:
         plt.title(title)
         if legend is not None:
             plt.legend(legend)
+        if ylim is not None:
+            plt.ylim(ylim)
         plt.grid()
         plt.savefig(f'graphics/plots/{self.test_nr}_{self.tag_id}_plot{self.plot_count}.eps')
         self. plot_count += 1
+
+    def corner_dist(self):
+        x_dist = np.subtract(self.mc_x, self.x_c)
+        y_dist = np.subtract(self.mc_y, self.y_c)
+        self.dist = np.zeros((len(self.x), 1))
+        for i in range(len(self.x)):
+            self.dist[i] = np.sqrt(x_dist[i]**2 + y_dist[i]**2)
+        self.theta_div = np.arcsin(1/(np.sqrt(2)*self.dist))
