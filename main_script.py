@@ -34,7 +34,8 @@ while success:
     if count == len(t):
         break
     if success:
-        geneva_object_0.detect_tags(image, t[count])
+        if np.mod(count, 2) == 0:
+            geneva_object_0.detect_tags(image, t[count])
     if count == 1000 or count == 7800:  # shows marker detection
         geneva_object_0.draw_tags()
     success, image = vidcap.read()
@@ -42,14 +43,15 @@ while success:
     count += 1
 rot_c_x, rot_c_y = geneva_object_0.find_center()
 geneva_object_0.find_angles()
-#geneva_object_0.corner_point_video()
+geneva_object_0.corner_point_video()
+cv2.imwrite('graphics/tag_det.png', geneva_object_0.image[300])
 geneva_object_0.normalize_signals()
 geneva_object_0.theta_dot = geneva_object_0.calc_derivatives()
 geneva_object_0.theta_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_dot)
 
 geneva_object_0.plot_signal(xlabel='time [sec]',ylabel='rad',title='angle corners', xlim=[0, 8.6])
 geneva_object_0.plot_signal(geneva_object_0.theta_dot,xlabel='time [sec]',ylabel=r'$\frac{rad}{s}$',title='angular velocity corners', xlim=[0, 8.6], ylim=[-0.8,0.2])
-geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='time [sec]',ylabel=r'$\frac{rad}{s^2}$',title='angular acceleration corners', xlim=[0, 8.6], ylim=[-12.75,12.75])
+geneva_object_0.plot_signal(geneva_object_0.theta_bis,xlabel='time [sec]',ylabel=r'$\frac{rad}{s^2}$',title='angular acceleration corners', xlim=[0, 8.6], ylim=[-3,3])
 
 # geneva_object_0.theta_smooth = geneva_object_0.smoothen_signal()
 #
@@ -82,8 +84,8 @@ print(np.sqrt(dx**2+dy**2))
 geneva_object_0.theta_mc_dot = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc)
 geneva_object_0.theta_mc_bis = geneva_object_0.calc_derivatives(geneva_object_0.theta_mc_dot)
 geneva_object_0.plot_signal(geneva_object_0.theta_mc, xlabel='time [sec]', ylabel='rad', title='marker center angle')#, xlim=[0, 8.6])
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='time [sec]', ylabel=r'$\frac{rad}{s}$', title='marker center angular velocity')#, xlim=[0, 8.6], ylim=[-0.8,0.2])
-geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='time [sec]', ylabel=r'$\frac{rad}{s^2}$', title='marker center angular acceleration')#, xlim=[0, 8.6], ylim=[-12.75,12.75])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_dot, xlabel='time [sec]', ylabel=r'$\frac{rad}{s}$', title='marker center angular velocity', xlim=[0, 8.6], ylim=[-0.8,0.2])
+geneva_object_0.plot_signal(geneva_object_0.theta_mc_bis, xlabel='time [sec]', ylabel=r'$\frac{rad}{s^2}$', title='marker center angular acceleration', xlim=[0, 8.6], ylim=[-3,3])
 
 #geneva_object_0.corner_dist()
 #geneva_object_0.data_to_text(geneva_object_0.theta_mc_bis, 'angular_acceleration_marker_center')
@@ -93,6 +95,7 @@ theta_error = 0.00095  # rad
 theta_dot_error = theta_error/t_diff  # assumed constant time diff of 1/30 sec
 theta_bis_error = theta_dot_error/t_diff
 fig1, ax1 = plt.subplots()
+plt.grid()
 plt.subplots_adjust(left=0.20, bottom=0.20)
 plt.plot(geneva_object_0.t, geneva_object_0.theta_mc_dot)
 plt.fill_between(geneva_object_0.t, geneva_object_0.theta_mc_dot+theta_dot_error,
@@ -101,21 +104,22 @@ plt.xlim([0, 8.6])
 plt.ylim([-0.8,0.2])
 plt.title('angular velocity with error region')
 plt.xlabel('time [sec]')
-plt.ylabel(r'$\frac{rad}{s}$')
+plt.ylabel(r'$\frac{rad}{s}$', rotation=0)
 plt.savefig(f'graphics/plots/ang_vel_error.eps')
 
 fig1, ax1 = plt.subplots()
+plt.grid()
 xlim=[0, 8.6]
-ylim=[-12.75,12.75]
+ylim=[-3,3]
 plt.xlim([0, 8.6])
-plt.ylim([-12.75,12.75])
+plt.ylim([-3,3])
 plt.subplots_adjust(left=0.20, bottom=0.20)
 plt.plot(geneva_object_0.t, geneva_object_0.theta_mc_bis)
 plt.fill_between(geneva_object_0.t, geneva_object_0.theta_mc_bis+theta_bis_error,
                  geneva_object_0.theta_mc_bis-theta_bis_error, color='red', alpha=0.3)
 plt.title('angular acceleration with error region')
 plt.xlabel('time [sec]')
-plt.ylabel(r'$\frac{rad}{s^2}$')
+plt.ylabel(r'$\frac{rad}{s^2}$', rotation=0)
 plt.savefig(f'graphics/plots/ang_acc_error.eps')
 
 fig1, ax1 = plt.subplots()
@@ -146,3 +150,5 @@ plt.xlabel('frame index')
 plt.ylabel('seconds')
 plt.savefig(f'graphics/plots/plot_time.eps')
 plt.show()
+
+print(min(t_diff))
