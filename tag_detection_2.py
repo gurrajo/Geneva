@@ -102,10 +102,10 @@ class Geneva:
                 return float('inf'), float('inf')
             return int(x / z), int(y / z)
 
-        x_1 = self.mc_x[int((len(self.x)*3/5))]
-        y_1 = self.mc_y[int((len(self.x)*3/5))]
-        x_2 = self.mc_x[int((len(self.x)*1/5))]  # points not to close to one another
-        y_2 = self.mc_y[int((len(self.x)*1/5))]
+        x_1 = self.x[int((len(self.x)*3/5))][0]
+        y_1 = self.y[int((len(self.x)*3/5))][0]
+        x_2 = self.x[int((len(self.x)*1/5))][0]  # points not to close to one another
+        y_2 = self.y[int((len(self.x)*1/5))][0]
 
         def f_1(x):
             return (y_1 + y_2)/2 + (x_2-x_1)/(y_2 - y_1)*(x_1+x_2)/2 - (x_2-x_1)/(y_2-y_1)*x
@@ -117,10 +117,10 @@ class Geneva:
         image = cv2.circle(image, (x_1, y_1), 10, (0, 0, 0))
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
-        x_1 = self.mc_x[int((len(self.x)*2/5))]
-        y_1 = self.mc_y[int((len(self.x)*2/5))]
-        x_2 = self.mc_x[int((len(self.x)*3/4))]
-        y_2 = self.mc_y[int((len(self.x)*3/4))]
+        x_1 = self.x[int((len(self.x)*2/5))][2]
+        y_1 = self.y[int((len(self.x)*2/5))][2]
+        x_2 = self.x[int((len(self.x)*3/4))][2]
+        y_2 = self.y[int((len(self.x)*3/4))][2]
 
         image = cv2.circle(image, (x_2, y_2), 10, (0, 0, 0))
 
@@ -254,9 +254,9 @@ class Geneva:
         plt.xlim(xlim)
         plt.subplots_adjust(left=0.20, bottom=0.20)
         plt.plot(t, sig)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel, rotation=0)
-        plt.title(title)
+        plt.xlabel(xlabel, fontsize=12)
+        plt.ylabel(ylabel, fontsize=12)
+        #plt.title(title)
         if legend is not None:
             plt.legend(legend)
         if ylim is not None:
